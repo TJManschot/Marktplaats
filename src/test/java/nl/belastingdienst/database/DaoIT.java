@@ -2,6 +2,7 @@ package nl.belastingdienst.database;
 
 import nl.belastingdienst.database.testclasses.NonAbstractDao;
 import nl.belastingdienst.database.testclasses.TestEntity;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,9 +14,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DaoIT {
-    public EntityManager entityManager =
+    private final EntityManager entityManager =
             Persistence.createEntityManagerFactory("H2-test-marktplaats").createEntityManager();
-
     NonAbstractDao dao = new NonAbstractDao(entityManager);
 
     @BeforeEach
@@ -34,7 +34,7 @@ class DaoIT {
         dao.save(savedEntity2);
 
         List<TestEntity> result = dao.findAll();
-        TestEntity singleResult = dao.find(0L);
+        TestEntity singleResult = dao.find(1L);
 
         assertEquals(2, result.size());
         assertEquals(savedEntity1, result.get(0));

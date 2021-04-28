@@ -34,7 +34,7 @@ public abstract class Dao<E, K> {
 
     public List<E> findAll() {
         return entityManager
-                .createQuery("SELECT e FROM " + entityClass.getName() + " e;", entityClass)
+                .createQuery("SELECT e FROM " + entityClass.getName() + " e", entityClass)
                 .getResultList();
     }
 

@@ -7,15 +7,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 
 public class MarktplaatsApp {
-    public EntityManager entityManager =
-            Persistence.createEntityManagerFactory("MySQL-marktplaats").createEntityManager();
-
+    EntityManager entityManager = Persistence.createEntityManagerFactory("MySQL-marktplaats").createEntityManager();
 
     public static void main(String[] args) {
-//        MarktplaatsApp marktplaatsApp = new MarktplaatsApp();
-//
-//        marktplaatsApp.firstStartup(); // Voert noodzakelijke rijen in de database in.
-//        marktplaatsApp.testStartup(); // Voert niet-noodzakelijke rijen in de database in.
+        MarktplaatsApp marktplaatsApp = new MarktplaatsApp();
+        marktplaatsApp.firstStartup(); // Voert noodzakelijke rijen in de database in.
 
         Hoofdmenu.INSTANCE.start();
     }
@@ -33,15 +29,6 @@ public class MarktplaatsApp {
         entityManager.persist(versturen);
         entityManager.persist(versturenOnderRembours);
 
-        entityManager.getTransaction().commit();
-    }
-    public void testStartup() {
-        Gebruiker gebruiker = new Gebruiker();
-        Gebruikersnaam peter = new Gebruikersnaam();
-        peter.setGebruikersnaam("Peter");
-        gebruiker.setGebruikersnaam(peter);
-        entityManager.getTransaction().begin();
-        entityManager.persist(gebruiker);
         entityManager.getTransaction().commit();
     }
 }
