@@ -1,9 +1,12 @@
 package nl.belastingdienst.database;
 
-import nl.belastingdienst.database.testclasses.NonAbstractDao;
 import nl.belastingdienst.database.testclasses.TestEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
@@ -11,36 +14,38 @@ import javax.persistence.Persistence;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class DaoIT {
-    public EntityManager entityManager =
+    @Mock
+    public EntityManager entityManagerMock =
             Persistence.createEntityManagerFactory("H2-test-marktplaats").createEntityManager();
-    Dao<TestEntity, Long> dao = new NonAbstractDao<>();
+
+    @InjectMocks @SuppressWarnings("unchecked")
+    Dao<TestEntity, Long> spy = mock(Dao.class, withSettings().defaultAnswer(CALLS_REAL_METHODS));
 
     @BeforeEach
     void init() {
-        entityManager.getTransaction().begin();
-        entityManager.createQuery("DELETE FROM TestEntity").executeUpdate();
-        entityManager.getTransaction().commit();
+        entityManagerMock.getTransaction().begin();
+        entityManagerMock.createQuery("DELETE FROM TestEntity").executeUpdate();
+        entityManagerMock.getTransaction().commit();
     }
 
     @Test
-    void saveNewEntity() {
+    void saveAndFindNewEntities() {
         TestEntity savedEntity1 = new TestEntity("Opgeslagen entiteit 1");
         TestEntity savedEntity2 = new TestEntity("Opgeslagen entiteit 2");
 
-        dao.save(savedEntity1);
-        dao.save(savedEntity2);
+        spy.save(savedEntity1);
+        spy.save(savedEntity2);
 
-        entityManager.getTransaction().begin();
-        List<TestEntity> result
-                = entityManager
-                .createQuery("SELECT e FROM TestEntity e", TestEntity.class)
-                .getResultList();
-        entityManager.getTransaction().commit();
+        List<TestEntity> result = spy.findAll();
+        TestEntity singleResult = spy.find(0L);
 
         assertEquals(2, result.size());
         assertEquals(savedEntity1, result.get(0));
         assertEquals(savedEntity2, result.get(1));
+        assertEquals(savedEntity1, singleResult);
     }
 }
