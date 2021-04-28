@@ -23,6 +23,5 @@ class GebruikerDaoTest {
         assertThat(target).isNotNull();
         assertThat(target).isInstanceOf(GebruikerDao.class);
         assertEquals(Gebruiker.class, target.entityClass);
-        assertEquals(Long.class, target.keyClass);
     }
 }

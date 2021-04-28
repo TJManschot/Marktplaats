@@ -59,7 +59,7 @@ class DaoTest {
         doNothing().when(entityTransactionMock).commit();
         doNothing().when(entityManagerMock).persist(any());
 
-        target.saveList(list);
+        target.save(list);
 
         verify(entityManagerMock, atLeastOnce()).getTransaction();
         verify(entityTransactionMock).begin();
@@ -69,7 +69,7 @@ class DaoTest {
 
     @Test
     void find() {
-        Long key = 0L;
+        Long key = 1L;
         TestEntity expected = new TestEntity("My least favourite entity");
 
         when(entityManagerMock.find(TestEntity.class, key)).thenReturn(expected);
@@ -91,5 +91,37 @@ class DaoTest {
         List<TestEntity> actual = target.findAll();
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void delete() {
+        when(entityManagerMock.getTransaction()).thenReturn(entityTransactionMock);
+        doNothing().when(entityTransactionMock).begin();
+        doNothing().when(entityTransactionMock).commit();
+        when(entityManagerMock.find(any(), any())).thenReturn(new TestEntity(""));
+
+        target.delete(new TestEntity(""));
+
+        verify(entityManagerMock, atLeastOnce()).getTransaction();
+        verify(entityTransactionMock).begin();
+        verify(entityTransactionMock).commit();
+        verify(entityManagerMock).remove(any());
+    }
+
+    @Test
+    void deleteAll() {
+        int expected = 5;
+
+        when(entityManagerMock.createQuery(anyString())).thenReturn(queryMock);
+        when(entityManagerMock.getTransaction()).thenReturn(entityTransactionMock);
+        doNothing().when(entityTransactionMock).begin();
+        doNothing().when(entityTransactionMock).commit();
+        when(queryMock.executeUpdate()).thenReturn(expected);
+
+        assertEquals(expected, target.deleteAll());
+        verify(entityManagerMock, atLeastOnce()).getTransaction();
+        verify(entityTransactionMock).begin();
+        verify(entityTransactionMock).commit();
+        verify(entityManagerMock.createQuery(anyString())).executeUpdate();
     }
 }

@@ -1,5 +1,6 @@
 package nl.belastingdienst.app.accounts;
 
+import nl.belastingdienst.utility.Identificeerbaar;
 import nl.belastingdienst.utility.Valideerbaar;
 
 import javax.persistence.*;
@@ -8,7 +9,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
-public class Gebruiker implements Valideerbaar {
+public class Gebruiker implements Valideerbaar, Identificeerbaar<Long> {
     @Id
     @GeneratedValue
     private long lidnummer;
@@ -21,7 +22,7 @@ public class Gebruiker implements Valideerbaar {
     private Email email;
     @Embedded
     private Adres adres;
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @OneToMany(cascade = CascadeType.MERGE)
     @JoinTable(name = "bezorgwijzeregistratie",
             joinColumns = @JoinColumn(name = "gebruiker"),
             inverseJoinColumns = @JoinColumn(name = "bezorgwijze"))
@@ -32,10 +33,18 @@ public class Gebruiker implements Valideerbaar {
         return true;
     }
 
+    @Override
+    public Long getKey() {
+        return lidnummer;
+    }
+
     public void setGebruikersnaam(Gebruikersnaam gebruikersnaam) { this.gebruikersnaam = gebruikersnaam; }
     public void setEmail(Email email) { this.email = email; }
     public void setAdres(Adres adres) { this.adres = adres; }
-    public void addBezorgwijze(Bezorgwijze b) {
-        bezorgwijzen.add(b);
+    public void addBezorgwijze(Bezorgwijze bezorgwijze) {
+        bezorgwijzen.add(bezorgwijze);
+    }
+    public void removeBezorgwijze(Bezorgwijze bezorgwijze) {
+        bezorgwijzen.remove(bezorgwijze);
     }
 }

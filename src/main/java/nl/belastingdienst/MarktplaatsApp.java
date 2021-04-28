@@ -1,10 +1,13 @@
 package nl.belastingdienst;
 
-import nl.belastingdienst.app.accounts.*;
-import nl.belastingdienst.ui.*;
+import nl.belastingdienst.app.accounts.Bezorgwijze;
+import nl.belastingdienst.database.BezorgwijzeDao;
+import nl.belastingdienst.ui.Hoofdmenu;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
+import java.util.Arrays;
+import java.util.List;
 
 public class MarktplaatsApp {
     public EntityManager entityManager
@@ -18,18 +21,28 @@ public class MarktplaatsApp {
     }
 
     public void firstStartup() {
-        Bezorgwijze magazijn = new Bezorgwijze("Magazijn", "U brengt het product naar ons magazijn, waar de klant het op kan halen.");
-        Bezorgwijze ophalen = new Bezorgwijze("Ophalen", "Het product kan bij u thuis opgehaald worden.");
-        Bezorgwijze versturen = new Bezorgwijze("Versturen", "U stuurt het product per post.");
-        Bezorgwijze versturenOnderRembours = new Bezorgwijze("Versturen onder rembours", "U stuurt het product onder rembours.");
+        BezorgwijzeDao bezorgwijzeDao = BezorgwijzeDao.getInstance(entityManager);
 
-        entityManager.getTransaction().begin();
+        List<Bezorgwijze> opgeslagenBezorgwijzen = bezorgwijzeDao.findAll();
 
-        entityManager.persist(magazijn);
-        entityManager.persist(ophalen);
-        entityManager.persist(versturen);
-        entityManager.persist(versturenOnderRembours);
+        List<Bezorgwijze> bezorgwijzen = Arrays.asList(
+                new Bezorgwijze(
+                        "Magazijn",
+                        "U brengt het product naar ons magazijn, waar de klant het op kan halen."),
+                new Bezorgwijze(
+                        "Ophalen",
+                        "Het product kan bij u thuis opgehaald worden."),
+                new Bezorgwijze(
+                        "Versturen",
+                        "U stuurt het product per post."),
+                new Bezorgwijze(
+                        "Versturen onder rembours",
+                        "U stuurt het product onder rembours.")
+        );
 
-        entityManager.getTransaction().commit();
+        for (Bezorgwijze bezorgwijze : bezorgwijzen) {
+            if (!opgeslagenBezorgwijzen.contains(bezorgwijze))
+                bezorgwijzeDao.save(bezorgwijze);
+        }
     }
 }

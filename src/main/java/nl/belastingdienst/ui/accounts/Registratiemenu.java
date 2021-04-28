@@ -1,18 +1,22 @@
 package nl.belastingdienst.ui.accounts;
 
+import nl.belastingdienst.database.BezorgwijzeDao;
 import nl.belastingdienst.ui.algemeen.*;
 import nl.belastingdienst.app.accounts.*;
 import nl.belastingdienst.database.GebruikerDao;
 
+import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
+import java.util.List;
 
 public enum Registratiemenu implements Menu, Afbreekbaar {
     INSTANCE;
 
-    Gebruiker gebruiker;
-    boolean isAkkoord = false;
-    Bezorgwijzenkeuzemenu bezorgwijzenkeuzemenu = new Bezorgwijzenkeuzemenu();
-    Optie[] opties = new Optie[]{
+    private Gebruiker gebruiker;
+    private boolean isAkkoord = false;
+    private final EntityManager entityManager = Persistence.createEntityManagerFactory("MySQL-marktplaats").createEntityManager();
+    private final Bezorgwijzenkeuzemenu bezorgwijzenkeuzemenu = new Bezorgwijzenkeuzemenu();
+    private final Optie[] opties = new Optie[]{
             new Optie("1", "Gebruikersnaam kiezen", this::kiesGebruikersnaam),
             new Optie("2", "Email-adres invoeren", this::voerEmailadresIn),
             new Optie("3", "Adres invoeren", this::voerAdresIn),
@@ -144,10 +148,23 @@ public enum Registratiemenu implements Menu, Afbreekbaar {
     }
 
     class Bezorgwijzenkeuzemenu implements Menu, Afbreekbaar {
-        Optie[] opties;
+        BezorgwijzeDao bezorgwijzeDao = BezorgwijzeDao.getInstance(entityManager);
+
+        final List<Bezorgwijze> bezorgwijzen = bezorgwijzeDao.findAll();
+        Runnable[] runnables = new Runnable[bezorgwijzen.size()];
+        final Optie[] opties = new Optie[bezorgwijzen.size() + 1];
 
         @Override
         public void start() {
+            int j;
+            for (int i = 0; i < bezorgwijzen.size() ; i++) {
+                int trickingTheCompiler = i;
+                runnables[i] = () -> toggle(opties[trickingTheCompiler], bezorgwijzen.get(trickingTheCompiler));
+                j = i + 1;
+                opties[i] = new Optie("" + j, "[ ] " + bezorgwijzen.get(i).getNaam() + ": " + bezorgwijzen.get(i).getOmschrijving(), runnables[i]);
+            }
+            opties[bezorgwijzen.size()] = new Optie("T", "Terug", () -> {});
+
             start(opties);
         }
 
@@ -156,8 +173,16 @@ public enum Registratiemenu implements Menu, Afbreekbaar {
             toonOpties(opties);
         }
 
-        public void toggle(Optie optie) {
-
+        public void toggle(Optie optie, Bezorgwijze bezorgwijze) {
+            String omschrijving = optie.getOmschrijving();
+            if (omschrijving.startsWith("[ ]")) {
+                optie.setOmschrijving("[X]" + omschrijving.substring(3));
+                gebruiker.addBezorgwijze(bezorgwijze);
+            }
+            else {
+                optie.setOmschrijving("[ ]" + omschrijving.substring(3));
+                gebruiker.removeBezorgwijze(bezorgwijze);
+            }
         }
     }
 
@@ -184,7 +209,7 @@ public enum Registratiemenu implements Menu, Afbreekbaar {
 
     public void rondAf() {
         if (isAkkoord && gebruiker.valideer()) {
-            GebruikerDao.getInstance(Persistence.createEntityManagerFactory("MySQL-marktplaats").createEntityManager()).save(gebruiker);
+            GebruikerDao.getInstance(entityManager).save(gebruiker);
         } else {
             System.out.println("Ongeldige invoer! Kan niet geregistreerd worden! ");
         }

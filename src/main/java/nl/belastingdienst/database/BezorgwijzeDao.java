@@ -9,10 +9,9 @@ public class BezorgwijzeDao extends Dao<Bezorgwijze, Long> {
 
     private BezorgwijzeDao(EntityManager entityManager) { super(entityManager); }
 
-    public BezorgwijzeDao getInstance(EntityManager entityManager) {
+    public static BezorgwijzeDao getInstance(EntityManager entityManager) {
         if(instance == null)
             instance = new BezorgwijzeDao(entityManager);
         return instance;
     }
-
 }

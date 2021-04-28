@@ -24,6 +24,8 @@ public class Optie {
         return this.code;
     }
 
+    public String getOmschrijving() { return omschrijving; }
+
     public Runnable getRunnable() {
         return this.runnable;
     }
