@@ -1,12 +1,9 @@
 package nl.belastingdienst.database;
 
+import nl.belastingdienst.database.testclasses.NonAbstractDao;
 import nl.belastingdienst.database.testclasses.TestEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
@@ -14,22 +11,18 @@ import javax.persistence.Persistence;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class DaoIT {
-    @Mock
-    public EntityManager entityManagerMock =
+    public EntityManager entityManager =
             Persistence.createEntityManagerFactory("H2-test-marktplaats").createEntityManager();
 
-    @InjectMocks @SuppressWarnings("unchecked")
-    Dao<TestEntity, Long> dao = mock(Dao.class, withSettings().defaultAnswer(CALLS_REAL_METHODS));
+    NonAbstractDao dao = new NonAbstractDao(entityManager);
 
     @BeforeEach
     void init() {
-        entityManagerMock.getTransaction().begin();
-        entityManagerMock.createQuery("DELETE FROM TestEntity").executeUpdate();
-        entityManagerMock.getTransaction().commit();
+        entityManager.getTransaction().begin();
+        entityManager.createQuery("DELETE FROM TestEntity").executeUpdate();
+        entityManager.getTransaction().commit();
     }
 
     @Test

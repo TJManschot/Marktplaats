@@ -3,7 +3,6 @@ package nl.belastingdienst.database;
 import nl.belastingdienst.utility.GenericTypeGetter;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 import java.util.List;
 
 /**
@@ -11,19 +10,20 @@ import java.util.List;
  * @param <K> Primary key K
  */
 public abstract class Dao<E, K> {
-    protected Class<?> entityClass;
-    protected Class<?> keyClass;
+    protected Class<E> entityClass;
+    protected Class<K> keyClass;
 
     protected final EntityManager entityManager;
 
+    @SuppressWarnings("unchecked")
     public Dao(EntityManager entityManager) {
         this.entityManager = entityManager;
 
         Class<?>[] classes = GenericTypeGetter.INSTANCE.getGenericTypes(Dao.class, getClass());
         assert (classes != null && classes.length == 2);
 
-        entityClass = classes[0];
-        keyClass = classes[1];
+        entityClass = (Class<E>) classes[0];
+        keyClass = (Class<K>) classes[1];
     }
 
     public void save(E entity) {
@@ -33,11 +33,13 @@ public abstract class Dao<E, K> {
     }
 
     public List<E> findAll() {
-        return null;
+        return entityManager
+                .createQuery("SELECT e FROM " + entityClass.getName() + " e;", entityClass)
+                .getResultList();
     }
 
     public E find(K primaryKey) {
-        return null;
+        return entityManager.find(entityClass, primaryKey);
     }
 
 }

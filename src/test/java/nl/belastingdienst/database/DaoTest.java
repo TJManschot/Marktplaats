@@ -1,5 +1,6 @@
 package nl.belastingdienst.database;
 
+import nl.belastingdienst.database.testclasses.NonAbstractDao;
 import nl.belastingdienst.database.testclasses.TestEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +25,10 @@ class DaoTest {
     @Mock
     public EntityTransaction entityTransactionMock;
     @Mock
-    public Query queryMock;
+    public TypedQuery<TestEntity> queryMock;
 
-    @InjectMocks @SuppressWarnings("unchecked")
-    Dao<TestEntity, Long> target = mock(Dao.class, withSettings().defaultAnswer(CALLS_REAL_METHODS));
+    @InjectMocks
+    NonAbstractDao target;
 
     @Test
     void save() {
@@ -42,9 +43,9 @@ class DaoTest {
         target.save(testEntity);
 
         verify(entityManagerMock, atLeastOnce()).getTransaction();
-        verify(entityManagerMock).persist(testEntity);
         verify(entityTransactionMock).begin();
         verify(entityTransactionMock).commit();
+        verify(entityManagerMock).persist(testEntity);
     }
 
     @Test
@@ -53,7 +54,7 @@ class DaoTest {
         expected.add(new TestEntity("My second-to-last list item"));
         expected.add(new TestEntity("My second list item"));
 
-        when(entityManagerMock.createQuery(anyString())).thenReturn(queryMock);
+        when(entityManagerMock.createQuery(anyString(), eq(TestEntity.class))).thenReturn(queryMock);
         when(queryMock.getResultList()).thenReturn(expected);
 
         List<TestEntity> actual = target.findAll();
