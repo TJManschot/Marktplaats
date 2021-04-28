@@ -7,7 +7,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 
 public class MarktplaatsApp {
-    EntityManager entityManager = Persistence.createEntityManagerFactory("MySQL-marktplaats").createEntityManager();
+    public EntityManager entityManager
+            = Persistence.createEntityManagerFactory("MySQL-marktplaats").createEntityManager();
 
     public static void main(String[] args) {
         MarktplaatsApp marktplaatsApp = new MarktplaatsApp();

@@ -2,7 +2,6 @@ package nl.belastingdienst.database;
 
 import nl.belastingdienst.database.testclasses.NonAbstractDao;
 import nl.belastingdienst.database.testclasses.TestEntity;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

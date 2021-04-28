@@ -32,14 +32,21 @@ public abstract class Dao<E, K> {
         entityManager.getTransaction().commit();
     }
 
-    public List<E> findAll() {
-        return entityManager
-                .createQuery("SELECT e FROM " + entityClass.getName() + " e", entityClass)
-                .getResultList();
+    public void saveList(List<E> list) {
+        entityManager.getTransaction().begin();
+        for(E entity : list) {
+            entityManager.persist(entity);
+        }
+        entityManager.getTransaction().commit();
     }
 
     public E find(K primaryKey) {
         return entityManager.find(entityClass, primaryKey);
     }
 
+    public List<E> findAll() {
+        return entityManager
+                .createQuery("SELECT e FROM " + entityClass.getName() + " e", entityClass)
+                .getResultList();
+    }
 }

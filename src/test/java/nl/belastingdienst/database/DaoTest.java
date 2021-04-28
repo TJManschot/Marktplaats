@@ -49,17 +49,22 @@ class DaoTest {
     }
 
     @Test
-    void findAll() {
-        List<TestEntity> expected = new ArrayList<>();
-        expected.add(new TestEntity("My second-to-last list item"));
-        expected.add(new TestEntity("My second list item"));
+    void saveList() {
+        List<TestEntity> list = new ArrayList<>();
+        list.add(new TestEntity("1"));
+        list.add(new TestEntity("2"));
 
-        when(entityManagerMock.createQuery(anyString(), eq(TestEntity.class))).thenReturn(queryMock);
-        when(queryMock.getResultList()).thenReturn(expected);
+        when(entityManagerMock.getTransaction()).thenReturn(entityTransactionMock);
+        doNothing().when(entityTransactionMock).begin();
+        doNothing().when(entityTransactionMock).commit();
+        doNothing().when(entityManagerMock).persist(any());
 
-        List<TestEntity> actual = target.findAll();
+        target.saveList(list);
 
-        assertEquals(expected, actual);
+        verify(entityManagerMock, atLeastOnce()).getTransaction();
+        verify(entityTransactionMock).begin();
+        verify(entityTransactionMock).commit();
+        verify(entityManagerMock, times(2)).persist(any());
     }
 
     @Test
@@ -70,6 +75,20 @@ class DaoTest {
         when(entityManagerMock.find(TestEntity.class, key)).thenReturn(expected);
 
         TestEntity actual = target.find(key);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void findAll() {
+        List<TestEntity> expected = new ArrayList<>();
+        expected.add(new TestEntity("My second-to-last list item"));
+        expected.add(new TestEntity("My second list item"));
+
+        when(entityManagerMock.createQuery(anyString(), eq(TestEntity.class))).thenReturn(queryMock);
+        when(queryMock.getResultList()).thenReturn(expected);
+
+        List<TestEntity> actual = target.findAll();
 
         assertEquals(expected, actual);
     }
