@@ -23,7 +23,7 @@ class DaoIT {
             Persistence.createEntityManagerFactory("H2-test-marktplaats").createEntityManager();
 
     @InjectMocks @SuppressWarnings("unchecked")
-    Dao<TestEntity, Long> spy = mock(Dao.class, withSettings().defaultAnswer(CALLS_REAL_METHODS));
+    Dao<TestEntity, Long> dao = mock(Dao.class, withSettings().defaultAnswer(CALLS_REAL_METHODS));
 
     @BeforeEach
     void init() {
@@ -37,11 +37,11 @@ class DaoIT {
         TestEntity savedEntity1 = new TestEntity("Opgeslagen entiteit 1");
         TestEntity savedEntity2 = new TestEntity("Opgeslagen entiteit 2");
 
-        spy.save(savedEntity1);
-        spy.save(savedEntity2);
+        dao.save(savedEntity1);
+        dao.save(savedEntity2);
 
-        List<TestEntity> result = spy.findAll();
-        TestEntity singleResult = spy.find(0L);
+        List<TestEntity> result = dao.findAll();
+        TestEntity singleResult = dao.find(0L);
 
         assertEquals(2, result.size());
         assertEquals(savedEntity1, result.get(0));

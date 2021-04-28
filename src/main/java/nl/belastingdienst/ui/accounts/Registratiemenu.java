@@ -4,6 +4,8 @@ import nl.belastingdienst.ui.algemeen.*;
 import nl.belastingdienst.app.accounts.*;
 import nl.belastingdienst.database.GebruikerDao;
 
+import javax.persistence.Persistence;
+
 public enum Registratiemenu implements Menu, Afbreekbaar {
     INSTANCE;
 
@@ -182,7 +184,7 @@ public enum Registratiemenu implements Menu, Afbreekbaar {
 
     public void rondAf() {
         if (isAkkoord && gebruiker.valideer()) {
-            GebruikerDao.getInstance().save(gebruiker);
+            GebruikerDao.getInstance(Persistence.createEntityManagerFactory("MySQL-marktplaats").createEntityManager()).save(gebruiker);
         } else {
             System.out.println("Ongeldige invoer! Kan niet geregistreerd worden! ");
         }

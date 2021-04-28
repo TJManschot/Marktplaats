@@ -2,8 +2,10 @@ package nl.belastingdienst.database;
 
 import nl.belastingdienst.database.testclasses.TestEntity;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -15,14 +17,17 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class DaoTest {
     @Mock
     public EntityManager entityManagerMock;
+    @Mock
     public EntityTransaction entityTransactionMock;
+    @Mock
     public Query queryMock;
 
     @InjectMocks @SuppressWarnings("unchecked")
-    Dao<TestEntity, Long> spy = mock(Dao.class, withSettings().defaultAnswer(CALLS_REAL_METHODS));
+    Dao<TestEntity, Long> target = mock(Dao.class, withSettings().defaultAnswer(CALLS_REAL_METHODS));
 
     @Test
     void save() {
@@ -34,7 +39,7 @@ class DaoTest {
         doNothing().when(entityTransactionMock).commit();
         doNothing().when(entityManagerMock).persist(any());
 
-        spy.save(testEntity);
+        target.save(testEntity);
 
         verify(entityManagerMock, atLeastOnce()).getTransaction();
         verify(entityManagerMock).persist(testEntity);
@@ -51,7 +56,7 @@ class DaoTest {
         when(entityManagerMock.createQuery(anyString())).thenReturn(queryMock);
         when(queryMock.getResultList()).thenReturn(expected);
 
-        List<TestEntity> actual = spy.findAll();
+        List<TestEntity> actual = target.findAll();
 
         assertEquals(expected, actual);
     }
@@ -63,7 +68,7 @@ class DaoTest {
 
         when(entityManagerMock.find(TestEntity.class, key)).thenReturn(expected);
 
-        TestEntity actual = spy.find(key);
+        TestEntity actual = target.find(key);
 
         assertEquals(expected, actual);
     }
