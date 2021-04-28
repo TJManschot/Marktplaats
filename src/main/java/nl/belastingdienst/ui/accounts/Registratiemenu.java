@@ -2,18 +2,19 @@ package nl.belastingdienst.ui.accounts;
 
 import nl.belastingdienst.ui.algemeen.*;
 import nl.belastingdienst.app.accounts.*;
-import nl.belastingdienst.database.accounts.GebruikerDao;
+import nl.belastingdienst.database.GebruikerDao;
 
 public enum Registratiemenu implements Menu, Afbreekbaar {
     INSTANCE;
 
     Gebruiker gebruiker;
     boolean isAkkoord = false;
+    Bezorgwijzenkeuzemenu bezorgwijzenkeuzemenu = new Bezorgwijzenkeuzemenu();
     Optie[] opties = new Optie[]{
             new Optie("1", "Gebruikersnaam kiezen", this::kiesGebruikersnaam),
             new Optie("2", "Email-adres invoeren", this::voerEmailadresIn),
             new Optie("3", "Adres invoeren", this::voerAdresIn),
-            new Optie("4", "Ondersteunde bezorgwijzen kiezen", () -> {}),
+            new Optie("4", "Ondersteunde bezorgwijzen kiezen", bezorgwijzenkeuzemenu::start),
             new Optie("5", "[ ] Voorwaarden geaccepteerd", this::accepteerVoorwaarden),
             new Optie("6", "Registratie afronden", this::rondAf),
             new Optie("T", "Terug", () -> {})
@@ -140,6 +141,24 @@ public enum Registratiemenu implements Menu, Afbreekbaar {
         gebruiker.setAdres(adres);
     }
 
+    class Bezorgwijzenkeuzemenu implements Menu, Afbreekbaar {
+        Optie[] opties;
+
+        @Override
+        public void start() {
+            start(opties);
+        }
+
+        @Override
+        public void toonOpties() {
+            toonOpties(opties);
+        }
+
+        public void toggle(Optie optie) {
+
+        }
+    }
+
     public void accepteerVoorwaarden() {
         while (true) {
             System.out.print("Accepteert u de voorwaarden? (J/N) ");
@@ -162,7 +181,7 @@ public enum Registratiemenu implements Menu, Afbreekbaar {
     }
 
     public void rondAf() {
-        if (gebruiker.valideer()) {
+        if (isAkkoord && gebruiker.valideer()) {
             GebruikerDao.getInstance().save(gebruiker);
         } else {
             System.out.println("Ongeldige invoer! Kan niet geregistreerd worden! ");

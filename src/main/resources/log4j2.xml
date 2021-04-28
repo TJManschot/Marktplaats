@@ -34,7 +34,7 @@
         <Logger name="org.hibernate.type.descriptor.sql" level="TRACE"/>
 
         <Root level="DEBUG">
-            <AppenderRef ref="console"/>
+<!--            <AppenderRef ref="console"/>-->
             <AppenderRef ref="rollingFile"/>
         </Root>
     </Loggers>
