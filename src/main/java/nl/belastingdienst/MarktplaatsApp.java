@@ -17,7 +17,7 @@ public class MarktplaatsApp {
         MarktplaatsApp marktplaatsApp = new MarktplaatsApp();
         marktplaatsApp.firstStartup(); // Voert noodzakelijke rijen in de database in.
 
-        Hoofdmenu.INSTANCE.start();
+        (new Hoofdmenu()).start();
     }
 
     public void firstStartup() {

@@ -4,16 +4,19 @@ import nl.belastingdienst.ui.accounts.Registratiemenu;
 import nl.belastingdienst.ui.algemeen.Menu;
 import nl.belastingdienst.ui.algemeen.Optie;
 
-public enum Hoofdmenu implements Menu {
-    INSTANCE;
+public class Hoofdmenu extends Menu {
 
     Optie[] opties = new Optie[]{
-            new Optie("1", "Registreren", Registratiemenu.INSTANCE::start),
+            new Optie("1", "Registreren", this::registreer),
             new Optie("A", "Afsluiten", () -> {})
     };
 
-    @Override
     public void start() {
         start(opties);
+    }
+
+    private void registreer() {
+        Registratiemenu registratiemenu = new Registratiemenu();
+        registratiemenu.start();
     }
 }

@@ -2,11 +2,11 @@ package nl.belastingdienst.ui.algemeen;
 
 import java.util.Scanner;
 
-public interface Menu {
-    Scanner in = new Scanner(System.in);
+public abstract class Menu {
+    protected Scanner in = new Scanner(System.in);
+    protected Optie[] opties;
 
-    void start();
-    default void start(Optie[] opties) {
+    public void start(Optie[] opties) {
         String keuze;
 
         while (true) {
@@ -29,7 +29,7 @@ public interface Menu {
         }
     }
 
-    default void toonOpties(Optie[] opties) {
+    private void toonOpties(Optie[] opties) {
         StringBuilder sb = new StringBuilder();
 
         sb.append(getClass().getSimpleName())
@@ -43,8 +43,22 @@ public interface Menu {
         System.out.println(sb);
     }
 
-    default String vraagInvoer(String bericht) {
+    private String vraagInvoer(String bericht) {
         System.out.print(bericht);
         return in.nextLine();
+    }
+
+    protected boolean afbreken() {
+        Scanner in = new Scanner(System.in);
+
+        System.out.print("Weet u zeker dat u deze operatie af wilt breken? (J/N) ");
+        String invoer = in.nextLine();
+
+        if (invoer.equals("J"))
+            return true;
+        if (invoer.equals("N"))
+            return false;
+        System.out.println("Ongeldige invoer! ");
+        return afbreken();
     }
 }

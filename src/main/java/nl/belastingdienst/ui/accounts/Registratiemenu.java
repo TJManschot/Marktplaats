@@ -1,18 +1,14 @@
 package nl.belastingdienst.ui.accounts;
 
-import nl.belastingdienst.database.BezorgwijzeDao;
 import nl.belastingdienst.ui.algemeen.*;
 import nl.belastingdienst.app.accounts.*;
 import nl.belastingdienst.database.GebruikerDao;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
-import java.util.List;
 import java.util.Locale;
 
-public enum Registratiemenu implements Menu, Afbreekbaar {
-    INSTANCE;
-
+public class Registratiemenu extends Menu {
     private Gebruiker gebruiker;
     private boolean isAkkoord = false;
     private final EntityManager entityManager = Persistence.createEntityManagerFactory("MySQL-marktplaats").createEntityManager();
@@ -21,13 +17,12 @@ public enum Registratiemenu implements Menu, Afbreekbaar {
             new Optie("1", "Gebruikersnaam kiezen", this::kiesGebruikersnaam),
             new Optie("2", "Email-adres invoeren", this::voerEmailadresIn),
             new Optie("3", "Adres invoeren", this::voerAdresIn),
-            new Optie("4", "Ondersteunde bezorgwijzen kiezen", bezorgwijzenkeuzemenu::start),
+            new Optie("4", "Ondersteunde bezorgwijzen kiezen", () -> new Bezorgwijzenkeuzemenu().start(gebruiker)),
             new Optie("5", "[ ] Voorwaarden geaccepteerd", this::accepteerVoorwaarden),
             new Optie("6", "Registratie afronden", this::rondAf),
             new Optie("T", "Terug", () -> {})
     };
 
-    @Override
     public void start() {
         gebruiker = new Gebruiker();
         start(opties);
@@ -141,40 +136,6 @@ public enum Registratiemenu implements Menu, Afbreekbaar {
         opties[2].setOmschrijving("Postcode: " + adres.getPostcode() + " " + adres.getStad() +
                 "\n    Straat:   " + adres.getStraat() + " " + adres.getHuisnummer());
         gebruiker.setAdres(adres);
-    }
-
-    class Bezorgwijzenkeuzemenu implements Menu, Afbreekbaar {
-        BezorgwijzeDao bezorgwijzeDao = BezorgwijzeDao.getInstance(entityManager);
-
-        final List<Bezorgwijze> bezorgwijzen = bezorgwijzeDao.findAll();
-        Runnable[] runnables = new Runnable[bezorgwijzen.size()];
-        final Optie[] opties = new Optie[bezorgwijzen.size() + 1];
-
-        @Override
-        public void start() {
-            int j;
-            for (int i = 0; i < bezorgwijzen.size() ; i++) {
-                int trickingTheCompiler = i;
-                runnables[i] = () -> toggle(opties[trickingTheCompiler], bezorgwijzen.get(trickingTheCompiler));
-                j = i + 1;
-                opties[i] = new Optie("" + j, "[ ] " + bezorgwijzen.get(i).getNaam() + ": " + bezorgwijzen.get(i).getOmschrijving(), runnables[i]);
-            }
-            opties[bezorgwijzen.size()] = new Optie("T", "Terug", () -> {});
-
-            start(opties);
-        }
-
-        public void toggle(Optie optie, Bezorgwijze bezorgwijze) {
-            String omschrijving = optie.getOmschrijving();
-            if (omschrijving.startsWith("[ ]")) {
-                optie.setOmschrijving("[X]" + omschrijving.substring(3));
-                gebruiker.addBezorgwijze(bezorgwijze);
-            }
-            else {
-                optie.setOmschrijving("[ ]" + omschrijving.substring(3));
-                gebruiker.removeBezorgwijze(bezorgwijze);
-            }
-        }
     }
 
     public void accepteerVoorwaarden() {
