@@ -16,9 +16,4 @@ public enum Hoofdmenu implements Menu {
     public void start() {
         start(opties);
     }
-
-    @Override
-    public void toonOpties() {
-        toonOpties(opties);
-    }
 }

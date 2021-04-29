@@ -33,11 +33,6 @@ public enum Registratiemenu implements Menu, Afbreekbaar {
         start(opties);
     }
 
-    @Override
-    public void toonOpties() {
-        toonOpties(opties);
-    }
-
     public void kiesGebruikersnaam() {
         Gebruikersnaam gebruikersnaam = new Gebruikersnaam();
         String invoer;
@@ -167,11 +162,6 @@ public enum Registratiemenu implements Menu, Afbreekbaar {
             opties[bezorgwijzen.size()] = new Optie("T", "Terug", () -> {});
 
             start(opties);
-        }
-
-        @Override
-        public void toonOpties() {
-            toonOpties(opties);
         }
 
         public void toggle(Optie optie, Bezorgwijze bezorgwijze) {

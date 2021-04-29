@@ -7,26 +7,28 @@ public interface Menu {
 
     void start();
     default void start(Optie[] opties) {
-        toonOpties();
-
         String keuze;
-        while(!(keuze = vraagInvoer("Uw keuze: ")).equals(opties[opties.length-1].getCode())) {
-            for(Optie optie : opties) {
-                if(keuze.equals(optie.getCode())) {
+
+        while (true) {
+            toonOpties(opties);
+            keuze = vraagInvoer("Uw keuze: ");
+
+            if (keuze.equals(opties[opties.length - 1].getCode()))
+                break;
+
+            for (Optie optie : opties) {
+                if (keuze.equals(optie.getCode())) {
                     optie.getRunnable().run();
-                    toonOpties();
                     keuze = "";
                     break;
                 }
             }
 
-            if(!keuze.isEmpty())
+            if (!keuze.isEmpty())
                 System.out.println("\nOngeldige keuze!");
         }
-        opties[opties.length-1].getRunnable().run();
     }
 
-    void toonOpties();
     default void toonOpties(Optie[] opties) {
         StringBuilder sb = new StringBuilder();
 
