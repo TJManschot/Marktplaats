@@ -11,7 +11,36 @@ public class Adres implements Valideerbaar {
     private String straat;
     private String huisnummer;
 
-    public boolean valideer() { return true; }
+    public boolean valideer() {
+        if (postcode == null || stad == null || straat == null || huisnummer == null)
+            return false;
+        if (postcode.isBlank() || stad.isBlank() || straat.isBlank() || huisnummer.isBlank())
+            return false;
+
+        char[] postcodeArray = postcode.toCharArray();
+        int aantalCijfers = 0;
+        int aantalLetters = 0;
+
+        for (char c : postcodeArray) {
+            if (c == ' ')
+                continue;
+            if (aantalCijfers < 4) {
+                if (!Character.isDigit(c))
+                    return false;
+                aantalCijfers++;
+                continue;
+            }
+            if (aantalLetters < 2) {
+                if (!Character.isLetter(c))
+                    return false;
+                aantalLetters++;
+                continue;
+            }
+            return false;
+        }
+
+        return aantalCijfers == 4 && aantalLetters == 2;
+    }
 
     public Adres() {}
 

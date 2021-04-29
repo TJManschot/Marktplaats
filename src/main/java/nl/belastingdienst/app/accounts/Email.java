@@ -16,21 +16,21 @@ public class Email implements Valideerbaar {
 
 
         char[] chars = email.toLowerCase(Locale.ROOT).toCharArray();
-        //noinspection ForLoopReplaceableByForEach
-        for (int i = 0; i < chars.length; i++) {
-            if (chars[i] == '@') {
+
+        for (char c : chars) {
+            if (c == '@') {
                 if (!regularCharacterFound)
                     return false;
                 atFound = true;
                 regularCharacterFound = false;
             }
-            if (chars[i] == '.') {
+            if (c == '.') {
                 if (!regularCharacterFound)
                     return false;
                 dotFound = true;
                 regularCharacterFound = false;
             }
-            if (Character.isLetterOrDigit(chars[i]))
+            if (Character.isLetterOrDigit(c))
                 regularCharacterFound = true;
         }
 
