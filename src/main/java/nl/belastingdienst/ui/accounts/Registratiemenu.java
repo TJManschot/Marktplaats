@@ -8,6 +8,7 @@ import nl.belastingdienst.database.GebruikerDao;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import java.util.List;
+import java.util.Locale;
 
 public enum Registratiemenu implements Menu, Afbreekbaar {
     INSTANCE;
@@ -208,7 +209,13 @@ public enum Registratiemenu implements Menu, Afbreekbaar {
     }
 
     public void rondAf() {
-        if (isAkkoord && gebruiker.valideer()) {
+        boolean voorwaarde = isAkkoord && gebruiker.valideer();
+        for (Bezorgwijze bezorgwijze : gebruiker.getBezorgwijzen()) {
+            if (bezorgwijze.getNaam().toLowerCase(Locale.ROOT).equals("ophalen"))
+                voorwaarde = voorwaarde && gebruiker.getAdres() != null;
+        }
+
+        if (voorwaarde) {
             GebruikerDao.getInstance(entityManager).save(gebruiker);
         } else {
             System.out.println("Ongeldige invoer! Kan niet geregistreerd worden! ");

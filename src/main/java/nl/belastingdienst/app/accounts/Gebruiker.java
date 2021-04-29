@@ -22,6 +22,7 @@ public class Gebruiker implements Valideerbaar, Identificeerbaar<Long> {
     private Email email;
     @Embedded
     private Adres adres;
+    @SuppressWarnings("JpaDataSourceORMInspection")
     @OneToMany(cascade = CascadeType.MERGE)
     @JoinTable(name = "bezorgwijzeregistratie",
             joinColumns = @JoinColumn(name = "gebruiker"),
@@ -40,7 +41,9 @@ public class Gebruiker implements Valideerbaar, Identificeerbaar<Long> {
 
     public void setGebruikersnaam(Gebruikersnaam gebruikersnaam) { this.gebruikersnaam = gebruikersnaam; }
     public void setEmail(Email email) { this.email = email; }
+    public Adres getAdres() { return adres; }
     public void setAdres(Adres adres) { this.adres = adres; }
+    public Set<Bezorgwijze> getBezorgwijzen() { return bezorgwijzen; }
     public void addBezorgwijze(Bezorgwijze bezorgwijze) {
         bezorgwijzen.add(bezorgwijze);
     }
