@@ -21,7 +21,7 @@ class GebruikerTest {
 
     @BeforeEach
     public void init() {
-        validGebruikersnaam.setGebruikersnaam("Thomas");
+        validGebruikersnaam.setGebruikersnaam("Thomasi32nrkjfwn32hndlkw");
         validEmail.setEmail("example@example.com");
         validAdres.setPostcode("1234 AB");
         validAdres.setStad("Apeldoorn");

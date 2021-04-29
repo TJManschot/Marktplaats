@@ -8,12 +8,11 @@ import nl.belastingdienst.database.GebruikerDao;
 import javax.persistence.EntityManager;
 
 public class Registratiemenu extends Menu {
-    private Gebruiker gebruiker;
+    private final Gebruiker gebruiker = new Gebruiker();
     private boolean isAkkoord = false;
     private final EntityManager entityManager = MarktplaatsApp.entityManager;
 
-    public void start() {
-        gebruiker = new Gebruiker();
+    public Registratiemenu() {
         Bezorgwijzenkeuzemenu bezorgwijzenkeuzemenu = new Bezorgwijzenkeuzemenu(gebruiker);
 
         opties = new Optie[]{
@@ -25,7 +24,9 @@ public class Registratiemenu extends Menu {
                 new Optie("6", "Registratie afronden", this::rondAf),
                 new Optie("T", "Terug", () -> { })
         };
+    }
 
+    public void start() {
         draaiMenu();
     }
 
@@ -33,21 +34,17 @@ public class Registratiemenu extends Menu {
         Gebruikersnaam gebruikersnaam = new Gebruikersnaam();
         String invoer;
 
+        //noinspection ConditionalBreakInInfiniteLoop
         while (true) {
             System.out.println("Kies een gebruikersnaam of kies A om af te breken");
 
             invoer = in.nextLine();
-            if (invoer.equals("A")) {
-                if (afbreken())
-                    return;
-                continue;
-            }
+            if (invoer.equals("A"))
+                return;
 
             gebruikersnaam.setGebruikersnaam(invoer);
             if (gebruikersnaam.valideer())
                 break;
-
-            System.out.println("Ongeldige gebruikersnaam!");
         }
 
         opties[0].setOmschrijving("Gebruikersnaam: " + gebruikersnaam.getGebruikersnaam());
@@ -81,62 +78,17 @@ public class Registratiemenu extends Menu {
 
     public void voerAdresIn() {
         Adres adres = new Adres();
-        String invoer;
+        if (gebruiker.getAdres() != null)
+            adres = gebruiker.getAdres();
 
-        while (true) {
-            System.out.println("Voer uw postcode in of kies A om af te breken.");
-
-            invoer = in.nextLine();
-            if (invoer.equals("A")) {
-                if (afbreken())
-                    return;
-                continue;
-            }
-
-            adres.setPostcode(invoer);
-
-            System.out.println("Voer uw stad in of kies A om af te breken.");
-
-            invoer = in.nextLine();
-            if (invoer.equals("A")) {
-                if (afbreken())
-                    return;
-                continue;
-            }
-
-            adres.setStad(invoer);
-
-            System.out.println("Voer uw straatnaam in of kies A om af te breken.");
-
-            invoer = in.nextLine();
-            if (invoer.equals("A")) {
-                if (afbreken())
-                    return;
-                continue;
-            }
-
-            adres.setStraat(invoer);
-
-            System.out.println("Voer uw huisnummer in of kies A om af te breken.");
-
-            invoer = in.nextLine();
-            if (invoer.equals("A")) {
-                if (afbreken())
-                    return;
-                continue;
-            }
-
-            adres.setHuisnummer(invoer);
-
-            if (adres.valideer())
-                break;
-
-            System.out.println("Ongeldig adres! ");
+        new Adresmenu(adres).draaiMenu();
+        if (adres.valideer()) {
+            gebruiker.setAdres(adres);
+            opties[2].setOmschrijving(
+                    "Postcode: " + adres.getPostcode() + " " + adres.getStad() +
+                            "\n    Straat:   " + adres.getStraat() + " " + adres.getHuisnummer()
+            );
         }
-
-        opties[2].setOmschrijving("Postcode: " + adres.getPostcode() + " " + adres.getStad() +
-                "\n    Straat:   " + adres.getStraat() + " " + adres.getHuisnummer());
-        gebruiker.setAdres(adres);
     }
 
     public void accepteerVoorwaarden() {
@@ -162,6 +114,7 @@ public class Registratiemenu extends Menu {
 
     public void rondAf() {
         if (isAkkoord && gebruiker.valideer()) {
+            System.out.println("Uw gegevens worden opgeslagen!");
             GebruikerDao.getInstance(entityManager).save(gebruiker);
         } else {
             System.out.println("Ongeldige invoer! Kan niet geregistreerd worden! ");

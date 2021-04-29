@@ -2,6 +2,8 @@ package nl.belastingdienst.app.accounts;
 
 import nl.belastingdienst.utility.Identificeerbaar;
 import nl.belastingdienst.utility.Valideerbaar;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.util.LinkedHashSet;
@@ -10,6 +12,9 @@ import java.util.Set;
 
 @Entity
 public class Gebruiker implements Valideerbaar, Identificeerbaar<Long> {
+    @Transient
+    private final Logger log = LoggerFactory.getLogger(Gebruiker.class);
+
     @Id
     @GeneratedValue
     private long lidnummer;
@@ -29,6 +34,7 @@ public class Gebruiker implements Valideerbaar, Identificeerbaar<Long> {
     @Override
     public boolean valideer() {
         boolean adresVerplicht = false;
+        boolean resultaat = true;
 
         for (Bezorgwijze bezorgwijze : bezorgwijzen) {
             if (bezorgwijze.getNaam().toLowerCase(Locale.ROOT).equals("ophalen")) {
@@ -37,10 +43,22 @@ public class Gebruiker implements Valideerbaar, Identificeerbaar<Long> {
             }
         }
 
-        if (gebruikersnaam == null || email == null || (adresVerplicht && adres == null))
-            return false;
+        if (gebruikersnaam == null) {
+            log.warn("Gebruikersnaam is verplicht.");
+            resultaat = false;
+        }
 
-        return gebruikersnaam.valideer() && email.valideer() && (adres == null || adres.valideer());
+        if (email == null) {
+            log.warn("Email-adres is verplicht.");
+            resultaat = false;
+        }
+
+        if (adresVerplicht && adres == null) {
+            log.warn("Adres is verplicht als u de bezorgoptie Ophalen wil ondersteunen.");
+            resultaat = false;
+        }
+
+        return resultaat && gebruikersnaam.valideer() && email.valideer() && (adres == null || adres.valideer());
     }
 
     @Override

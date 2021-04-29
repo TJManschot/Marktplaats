@@ -13,8 +13,10 @@ public abstract class Menu {
             toonOpties();
             keuze = vraagInvoer();
 
-            if (keuze.equals(opties[opties.length - 1].getCode()))
+            if (keuze.equals(opties[opties.length - 1].getCode())) {
+                opties[opties.length-1].getRunnable().run();
                 break;
+            }
 
             for (Optie optie : opties) {
                 if (keuze.equals(optie.getCode())) {
@@ -29,14 +31,17 @@ public abstract class Menu {
         }
     }
 
-    private void toonOpties() {
+    protected void toonOpties() {
         StringBuilder sb = new StringBuilder();
 
         sb.append(getClass().getSimpleName())
                 .append("\n");
 
         for (Optie optie : opties) {
-            sb.append(optie.toString())
+            sb.append("(")
+                    .append(optie.getCode())
+                    .append(") ")
+                    .append(optie.getOmschrijving())
                     .append("\n");
         }
 
