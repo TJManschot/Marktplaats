@@ -1,31 +1,32 @@
 package nl.belastingdienst.ui.accounts;
 
+import nl.belastingdienst.MarktplaatsApp;
 import nl.belastingdienst.ui.algemeen.*;
 import nl.belastingdienst.app.accounts.*;
 import nl.belastingdienst.database.GebruikerDao;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
-import java.util.Locale;
 
 public class Registratiemenu extends Menu {
     private Gebruiker gebruiker;
     private boolean isAkkoord = false;
-    private final EntityManager entityManager = Persistence.createEntityManagerFactory("MySQL-marktplaats").createEntityManager();
-    private final Bezorgwijzenkeuzemenu bezorgwijzenkeuzemenu = new Bezorgwijzenkeuzemenu();
-    private final Optie[] opties = new Optie[]{
-            new Optie("1", "Gebruikersnaam kiezen", this::kiesGebruikersnaam),
-            new Optie("2", "Email-adres invoeren", this::voerEmailadresIn),
-            new Optie("3", "Adres invoeren", this::voerAdresIn),
-            new Optie("4", "Ondersteunde bezorgwijzen kiezen", () -> new Bezorgwijzenkeuzemenu().start(gebruiker)),
-            new Optie("5", "[ ] Voorwaarden geaccepteerd", this::accepteerVoorwaarden),
-            new Optie("6", "Registratie afronden", this::rondAf),
-            new Optie("T", "Terug", () -> {})
-    };
+    private final EntityManager entityManager = MarktplaatsApp.entityManager;
 
     public void start() {
         gebruiker = new Gebruiker();
-        start(opties);
+        Bezorgwijzenkeuzemenu bezorgwijzenkeuzemenu = new Bezorgwijzenkeuzemenu(gebruiker);
+
+        opties = new Optie[]{
+                new Optie("1", "Gebruikersnaam kiezen", this::kiesGebruikersnaam),
+                new Optie("2", "Email-adres invoeren", this::voerEmailadresIn),
+                new Optie("3", "Adres invoeren", this::voerAdresIn),
+                new Optie("4", "Ondersteunde bezorgwijzen kiezen", bezorgwijzenkeuzemenu::start),
+                new Optie("5", "[ ] Voorwaarden geaccepteerd", this::accepteerVoorwaarden),
+                new Optie("6", "Registratie afronden", this::rondAf),
+                new Optie("T", "Terug", () -> { })
+        };
+
+        draaiMenu();
     }
 
     public void kiesGebruikersnaam() {
@@ -160,13 +161,7 @@ public class Registratiemenu extends Menu {
     }
 
     public void rondAf() {
-        boolean voorwaarde = isAkkoord && gebruiker.valideer();
-        for (Bezorgwijze bezorgwijze : gebruiker.getBezorgwijzen()) {
-            if (bezorgwijze.getNaam().toLowerCase(Locale.ROOT).equals("ophalen"))
-                voorwaarde = voorwaarde && gebruiker.getAdres() != null;
-        }
-
-        if (voorwaarde) {
+        if (isAkkoord && gebruiker.valideer()) {
             GebruikerDao.getInstance(entityManager).save(gebruiker);
         } else {
             System.out.println("Ongeldige invoer! Kan niet geregistreerd worden! ");

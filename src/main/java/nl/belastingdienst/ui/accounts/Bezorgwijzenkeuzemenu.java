@@ -17,12 +17,12 @@ public class Bezorgwijzenkeuzemenu extends Menu {
     BezorgwijzeDao bezorgwijzeDao = BezorgwijzeDao.getInstance(entityManager);
 
     final List<Bezorgwijze> bezorgwijzen = bezorgwijzeDao.findAll();
-    Runnable[] runnables = new Runnable[bezorgwijzen.size()];
-    final Optie[] opties = new Optie[bezorgwijzen.size() + 1];
 
-    public void start(Gebruiker gebruiker) {
-        this.gebruiker = gebruiker;
+    public Bezorgwijzenkeuzemenu(Gebruiker gebruiker) {
         int j;
+        this.gebruiker = gebruiker;
+        Runnable[] runnables = new Runnable[bezorgwijzen.size()];
+        opties = new Optie[bezorgwijzen.size() + 1];
         for (int i = 0; i < bezorgwijzen.size() ; i++) {
             int trickingTheCompiler = i;
             runnables[i] = () -> toggle(opties[trickingTheCompiler], bezorgwijzen.get(trickingTheCompiler));
@@ -30,8 +30,10 @@ public class Bezorgwijzenkeuzemenu extends Menu {
             opties[i] = new Optie("" + j, "[ ] " + bezorgwijzen.get(i).getNaam() + ": " + bezorgwijzen.get(i).getOmschrijving(), runnables[i]);
         }
         opties[bezorgwijzen.size()] = new Optie("T", "Terug", () -> {});
+    }
 
-        start(opties);
+    public void start() {
+        draaiMenu();
     }
 
     public void toggle(Optie optie, Bezorgwijze bezorgwijze) {

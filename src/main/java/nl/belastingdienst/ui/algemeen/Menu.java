@@ -6,12 +6,12 @@ public abstract class Menu {
     protected Scanner in = new Scanner(System.in);
     protected Optie[] opties;
 
-    public void start(Optie[] opties) {
+    public void draaiMenu() {
         String keuze;
 
         while (true) {
-            toonOpties(opties);
-            keuze = vraagInvoer("Uw keuze: ");
+            toonOpties();
+            keuze = vraagInvoer();
 
             if (keuze.equals(opties[opties.length - 1].getCode()))
                 break;
@@ -29,7 +29,7 @@ public abstract class Menu {
         }
     }
 
-    private void toonOpties(Optie[] opties) {
+    private void toonOpties() {
         StringBuilder sb = new StringBuilder();
 
         sb.append(getClass().getSimpleName())
@@ -43,8 +43,8 @@ public abstract class Menu {
         System.out.println(sb);
     }
 
-    private String vraagInvoer(String bericht) {
-        System.out.print(bericht);
+    private String vraagInvoer() {
+        System.out.print("Uw keuze: ");
         return in.nextLine();
     }
 
