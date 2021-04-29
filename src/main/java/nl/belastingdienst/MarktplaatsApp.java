@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MarktplaatsApp {
-    public EntityManager entityManager
+    public static EntityManager entityManager
             = Persistence.createEntityManagerFactory("MySQL-marktplaats").createEntityManager();
 
     public static void main(String[] args) {

@@ -10,6 +10,9 @@ public class Email implements Valideerbaar {
     private String email;
 
     public boolean valideer() {
+        if (email == null)
+            return false;
+
         boolean atFound = false;
         boolean dotFound = false;
         boolean regularCharacterFound = false;

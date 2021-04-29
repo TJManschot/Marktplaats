@@ -4,8 +4,8 @@ import nl.belastingdienst.utility.Identificeerbaar;
 import nl.belastingdienst.utility.Valideerbaar;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Set;
 
 @Entity
@@ -13,17 +13,14 @@ public class Gebruiker implements Valideerbaar, Identificeerbaar<Long> {
     @Id
     @GeneratedValue
     private long lidnummer;
-    private LocalDate registratiedatum;
     @Embedded
     private Gebruikersnaam gebruikersnaam;
-    @Embedded
-    private Wachtwoord wachtwoord;
     @Embedded
     private Email email;
     @Embedded
     private Adres adres;
     @SuppressWarnings("JpaDataSourceORMInspection")
-    @OneToMany(cascade = CascadeType.MERGE)
+    @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(name = "bezorgwijzeregistratie",
             joinColumns = @JoinColumn(name = "gebruiker"),
             inverseJoinColumns = @JoinColumn(name = "bezorgwijze"))
@@ -31,7 +28,19 @@ public class Gebruiker implements Valideerbaar, Identificeerbaar<Long> {
 
     @Override
     public boolean valideer() {
-        return true;
+        boolean adresVerplicht = false;
+
+        for (Bezorgwijze bezorgwijze : bezorgwijzen) {
+            if (bezorgwijze.getNaam().toLowerCase(Locale.ROOT).equals("ophalen")) {
+                adresVerplicht = true;
+                break;
+            }
+        }
+
+        if (gebruikersnaam == null || email == null || (adresVerplicht && adres == null))
+            return false;
+
+        return gebruikersnaam.valideer() && email.valideer() && (adres == null || adres.valideer());
     }
 
     @Override
@@ -39,14 +48,30 @@ public class Gebruiker implements Valideerbaar, Identificeerbaar<Long> {
         return lidnummer;
     }
 
-    public void setGebruikersnaam(Gebruikersnaam gebruikersnaam) { this.gebruikersnaam = gebruikersnaam; }
-    public void setEmail(Email email) { this.email = email; }
-    public Adres getAdres() { return adres; }
-    public void setAdres(Adres adres) { this.adres = adres; }
-    public Set<Bezorgwijze> getBezorgwijzen() { return bezorgwijzen; }
+    public void setGebruikersnaam(Gebruikersnaam gebruikersnaam) {
+        this.gebruikersnaam = gebruikersnaam;
+    }
+
+    public void setEmail(Email email) {
+        this.email = email;
+    }
+
+    public Adres getAdres() {
+        return adres;
+    }
+
+    public void setAdres(Adres adres) {
+        this.adres = adres;
+    }
+
+    public Set<Bezorgwijze> getBezorgwijzen() {
+        return bezorgwijzen;
+    }
+
     public void addBezorgwijze(Bezorgwijze bezorgwijze) {
         bezorgwijzen.add(bezorgwijze);
     }
+
     public void removeBezorgwijze(Bezorgwijze bezorgwijze) {
         bezorgwijzen.remove(bezorgwijze);
     }

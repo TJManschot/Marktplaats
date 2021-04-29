@@ -26,4 +26,11 @@ class EmailTest {
         assertFalse(geenTekensTussenApenstaartEnPunt.valideer());
         assertFalse(geenTekensVoorApenstaart.valideer());
     }
+
+    @Test
+    void valideerEmailNull() {
+        Email email = new Email(null);
+
+        assertFalse(email.valideer());
+    }
 }

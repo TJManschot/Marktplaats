@@ -14,4 +14,8 @@ public class GebruikerDao extends Dao<Gebruiker, Long> {
             instance = new GebruikerDao(entityManager);
         return instance;
     }
+
+    public boolean checkIfGebruikersnaamExists(String gebruikersnaam) {
+        return checkIfFieldExists("gebruikersnaam", gebruikersnaam);
+    }
 }

@@ -56,6 +56,10 @@ public abstract class Dao<E extends Identificeerbaar<K>, K> {
                 .getResultList();
     }
 
+    protected boolean checkIfFieldExists(String field, Object value) {
+        return !findByField(field, value).isEmpty();
+    }
+
     public boolean delete(E entity) {
         if (find(entity.getKey()) == null)
             return false;
