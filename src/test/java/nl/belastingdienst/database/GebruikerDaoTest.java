@@ -1,8 +1,11 @@
 package nl.belastingdienst.database;
 
 import nl.belastingdienst.app.accounts.Gebruiker;
+import nl.belastingdienst.services.Services;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -16,7 +19,8 @@ class GebruikerDaoTest {
     @Mock
     EntityManager entityManagerMock;
 
-    private final GebruikerDao target = GebruikerDao.getInstance(entityManagerMock);
+    @InjectMocks
+    private GebruikerDao target;
 
     @Test
     void getInstance() {

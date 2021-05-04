@@ -1,20 +1,12 @@
 package nl.belastingdienst.app.accounts;
 
 import nl.belastingdienst.utility.Identificeerbaar;
-import nl.belastingdienst.utility.Valideerbaar;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
-import java.util.LinkedHashSet;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 @Entity
-public class Gebruiker implements Valideerbaar, Identificeerbaar<Long> {
-    @Transient
-    private final Logger log = LoggerFactory.getLogger(Gebruiker.class);
-
+public class Gebruiker implements Identificeerbaar<Long> {
     @Id
     @GeneratedValue
     private long lidnummer;
@@ -29,46 +21,20 @@ public class Gebruiker implements Valideerbaar, Identificeerbaar<Long> {
     @JoinTable(name = "bezorgwijzeregistratie",
             joinColumns = @JoinColumn(name = "gebruiker"),
             inverseJoinColumns = @JoinColumn(name = "bezorgwijze"))
-    private final Set<Bezorgwijze> bezorgwijzen = new LinkedHashSet<>();
-
-    @Override
-    public boolean valideer() {
-        boolean adresVerplicht = false;
-        boolean resultaat = true;
-
-        for (Bezorgwijze bezorgwijze : bezorgwijzen) {
-            if (bezorgwijze.getNaam().toLowerCase(Locale.ROOT).equals("ophalen")) {
-                adresVerplicht = true;
-                break;
-            }
-        }
-
-        if (gebruikersnaam == null) {
-            log.warn("Gebruikersnaam is verplicht.");
-            resultaat = false;
-        }
-
-        if (email == null) {
-            log.warn("Email-adres is verplicht.");
-            resultaat = false;
-        }
-
-        if (adresVerplicht && adres == null) {
-            log.warn("Adres is verplicht als u de bezorgoptie Ophalen wil ondersteunen.");
-            resultaat = false;
-        }
-
-        return resultaat && gebruikersnaam.valideer() && email.valideer() && (adres == null || adres.valideer());
-    }
+    private final List<Bezorgwijze> bezorgwijzen = new ArrayList<>();
 
     @Override
     public Long getKey() {
         return lidnummer;
     }
 
+    public Gebruikersnaam getGebruikersnaam() { return gebruikersnaam; }
+
     public void setGebruikersnaam(Gebruikersnaam gebruikersnaam) {
         this.gebruikersnaam = gebruikersnaam;
     }
+
+    public Email getEmail() { return email; }
 
     public void setEmail(Email email) {
         this.email = email;
@@ -82,7 +48,7 @@ public class Gebruiker implements Valideerbaar, Identificeerbaar<Long> {
         this.adres = adres;
     }
 
-    public Set<Bezorgwijze> getBezorgwijzen() {
+    public List<Bezorgwijze> getBezorgwijzen() {
         return bezorgwijzen;
     }
 

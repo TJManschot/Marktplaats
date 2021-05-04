@@ -1,7 +1,6 @@
 package nl.belastingdienst.database;
 
-import nl.belastingdienst.app.accounts.Gebruiker;
-
+import nl.belastingdienst.app.accounts.*;
 import javax.persistence.EntityManager;
 
 public class GebruikerDao extends Dao<Gebruiker, Long> {
@@ -15,7 +14,7 @@ public class GebruikerDao extends Dao<Gebruiker, Long> {
         return instance;
     }
 
-    public boolean checkIfGebruikersnaamExists(String gebruikersnaam) {
-        return checkIfFieldExists("gebruikersnaam", gebruikersnaam);
+    public boolean checkIfGebruikersnaamExists(Gebruikersnaam gebruikersnaam) {
+        return checkIfFieldExists("gebruikersnaam", gebruikersnaam.getGebruikersnaam());
     }
 }

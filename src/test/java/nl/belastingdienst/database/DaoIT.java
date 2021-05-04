@@ -2,6 +2,7 @@ package nl.belastingdienst.database;
 
 import nl.belastingdienst.database.testclasses.NonAbstractDao;
 import nl.belastingdienst.database.testclasses.TestEntity;
+import nl.belastingdienst.services.Services;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,6 +21,8 @@ class DaoIT {
 
     @BeforeEach
     void init() {
+        Services.INSTANCE.entityManager(entityManager);
+
         entityManager.getTransaction().begin();
         entityManager.createQuery("DELETE FROM TestEntity").executeUpdate();
         entityManager.getTransaction().commit();

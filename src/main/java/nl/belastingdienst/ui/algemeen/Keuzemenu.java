@@ -1,7 +1,13 @@
 package nl.belastingdienst.ui.algemeen;
 
-public class Keuzemenu extends Menu {
+import nl.belastingdienst.services.printer.Printer;
+
+public abstract class Keuzemenu extends Menu {
     protected boolean[] staatAan;
+
+    public Keuzemenu(Printer printer) {
+        super(printer);
+    }
 
     @Override
     protected void toonOpties() {
@@ -29,7 +35,7 @@ public class Keuzemenu extends Menu {
                 .append(opties[opties.length - 1].getOmschrijving())
                 .append("\n");
 
-        System.out.println(sb);
+        printer.print(sb.toString());
     }
 
     protected void toggle(int index) {

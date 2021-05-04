@@ -2,26 +2,32 @@ package nl.belastingdienst;
 
 import nl.belastingdienst.app.accounts.Bezorgwijze;
 import nl.belastingdienst.database.BezorgwijzeDao;
+import nl.belastingdienst.services.Services;
+import nl.belastingdienst.services.printer.SystemPrinter;
 import nl.belastingdienst.ui.Hoofdmenu;
 
-import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import java.util.Arrays;
 import java.util.List;
 
 public class MarktplaatsApp {
-    public static EntityManager entityManager
-            = Persistence.createEntityManagerFactory("MySQL-marktplaats").createEntityManager();
-
     public static void main(String[] args) {
+        Services.INSTANCE
+                .printer(SystemPrinter.INSTANCE)
+                .entityManager(
+                        Persistence
+                        .createEntityManagerFactory("MySQL-marktplaats")
+                        .createEntityManager()
+                );
+
         MarktplaatsApp marktplaatsApp = new MarktplaatsApp();
         marktplaatsApp.firstStartup(); // Voert noodzakelijke rijen in de database in.
 
-        new Hoofdmenu().start();
+        new Hoofdmenu(Services.INSTANCE.getPrinter()).draaiMenuAf();
     }
 
     public void firstStartup() {
-        BezorgwijzeDao bezorgwijzeDao = BezorgwijzeDao.getInstance(entityManager);
+        BezorgwijzeDao bezorgwijzeDao = BezorgwijzeDao.getInstance(Services.INSTANCE.getEntityManager());
 
         List<Bezorgwijze> opgeslagenBezorgwijzen = bezorgwijzeDao.findAll();
 

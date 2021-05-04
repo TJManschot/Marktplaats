@@ -1,33 +1,29 @@
 package nl.belastingdienst.ui.accounts;
 
-import nl.belastingdienst.MarktplaatsApp;
+import nl.belastingdienst.services.GebruikerValidator;
+import nl.belastingdienst.services.Services;
+import nl.belastingdienst.services.printer.Printer;
 import nl.belastingdienst.ui.algemeen.*;
 import nl.belastingdienst.app.accounts.*;
 import nl.belastingdienst.database.GebruikerDao;
 
-import javax.persistence.EntityManager;
-
 public class Registratiemenu extends Menu {
     private final Gebruiker gebruiker = new Gebruiker();
+    private final GebruikerValidator gebruikerValidator = new GebruikerValidator(GebruikerDao.getInstance(Services.INSTANCE.getEntityManager()), Services.INSTANCE.getPrinter());
+    private final Bezorgwijzenkeuzemenu bezorgwijzenkeuzemenu = new Bezorgwijzenkeuzemenu(printer, gebruiker);
     private boolean isAkkoord = false;
-    private final EntityManager entityManager = MarktplaatsApp.entityManager;
 
-    public Registratiemenu() {
-        Bezorgwijzenkeuzemenu bezorgwijzenkeuzemenu = new Bezorgwijzenkeuzemenu(gebruiker);
-
+    public Registratiemenu(Printer printer) {
+        super(printer);
         opties = new Optie[]{
                 new Optie("1", "Gebruikersnaam kiezen", this::kiesGebruikersnaam),
                 new Optie("2", "Email-adres invoeren", this::voerEmailadresIn),
                 new Optie("3", "Adres invoeren", this::voerAdresIn),
-                new Optie("4", "Ondersteunde bezorgwijzen kiezen", bezorgwijzenkeuzemenu::start),
+                new Optie("4", "Ondersteunde bezorgwijzen kiezen", bezorgwijzenkeuzemenu::draaiMenuAf),
                 new Optie("5", "[ ] Voorwaarden geaccepteerd", this::accepteerVoorwaarden),
                 new Optie("6", "Registratie afronden", this::rondAf),
                 new Optie("T", "Terug", () -> { })
         };
-    }
-
-    public void start() {
-        draaiMenu();
     }
 
     public void kiesGebruikersnaam() {
@@ -43,7 +39,7 @@ public class Registratiemenu extends Menu {
                 return;
 
             gebruikersnaam.setGebruikersnaam(invoer);
-            if (gebruikersnaam.valideer())
+            if (gebruikerValidator.valideer(gebruikersnaam))
                 break;
         }
 
@@ -66,7 +62,7 @@ public class Registratiemenu extends Menu {
             }
 
             email.setEmail(invoer);
-            if (email.valideer())
+            if (gebruikerValidator.valideer(email))
                 break;
 
             System.out.println("Ongeldig emailadres!");
@@ -81,8 +77,8 @@ public class Registratiemenu extends Menu {
         if (gebruiker.getAdres() != null)
             adres = gebruiker.getAdres();
 
-        new Adresmenu(adres).draaiMenu();
-        if (adres.valideer()) {
+        new Adresmenu(printer, adres).draaiMenuAf();
+        if (gebruikerValidator.valideer(adres)) {
             gebruiker.setAdres(adres);
             opties[2].setOmschrijving(
                     "Postcode: " + adres.getPostcode() + " " + adres.getStad() +
@@ -113,9 +109,9 @@ public class Registratiemenu extends Menu {
     }
 
     public void rondAf() {
-        if (isAkkoord && gebruiker.valideer()) {
+        if (isAkkoord && gebruikerValidator.valideer(gebruiker)) {
             System.out.println("Uw gegevens worden opgeslagen!");
-            GebruikerDao.getInstance(entityManager).save(gebruiker);
+            GebruikerDao.getInstance(Services.INSTANCE.getEntityManager()).save(gebruiker);
         } else {
             System.out.println("Ongeldige invoer! Kan niet geregistreerd worden! ");
         }

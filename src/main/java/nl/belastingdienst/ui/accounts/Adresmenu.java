@@ -1,13 +1,15 @@
 package nl.belastingdienst.ui.accounts;
 
 import nl.belastingdienst.app.accounts.Adres;
+import nl.belastingdienst.services.printer.Printer;
 import nl.belastingdienst.ui.algemeen.Menu;
 import nl.belastingdienst.ui.algemeen.Optie;
 
 public class Adresmenu extends Menu {
     Adres adres;
 
-    public Adresmenu(Adres adres) {
+    public Adresmenu(Printer printer, Adres adres) {
+        super(printer);
         this.adres = adres;
         opties = new Optie[]{
                 new Optie("1", "Postcode", this::postcodeWijzigen),

@@ -1,37 +1,17 @@
 package nl.belastingdienst.app.accounts;
 
-import nl.belastingdienst.MarktplaatsApp;
-import nl.belastingdienst.database.GebruikerDao;
-import nl.belastingdienst.utility.Valideerbaar;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.persistence.Embeddable;
-import javax.persistence.Transient;
 
 @Embeddable
-public class Gebruikersnaam implements Valideerbaar {
-    @Transient
-    private final Logger log = LoggerFactory.getLogger(Gebruikersnaam.class);
+public class Gebruikersnaam {
 
     private String gebruikersnaam;
-    @Transient
-    GebruikerDao gebruikerDao = GebruikerDao.getInstance(MarktplaatsApp.entityManager);
 
-    public boolean valideer() {
-        boolean resultaat = true;
+    public Gebruikersnaam() {
+    }
 
-        if (gebruikersnaam == null || gebruikersnaam.isBlank()) {
-            log.warn("De gebruikersnaam mag niet leeg zijn.");
-            resultaat = false;
-        }
-
-        if (gebruikerDao.checkIfGebruikersnaamExists(gebruikersnaam)) {
-            log.warn("De door u gekozen gebruikersnaam is reeds in gebruik.");
-            resultaat = false;
-        }
-
-        return resultaat;
+    public Gebruikersnaam(String gebruikersnaam) {
+        this.gebruikersnaam = gebruikersnaam;
     }
 
     public void setGebruikersnaam(String gebruikersnaam) {

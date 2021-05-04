@@ -1,12 +1,20 @@
 package nl.belastingdienst.ui.algemeen;
 
+import nl.belastingdienst.services.printer.Printer;
+import nl.belastingdienst.services.Services;
+
 import java.util.Scanner;
 
 public abstract class Menu {
     protected Scanner in = new Scanner(System.in);
+    protected Printer printer;
     protected Optie[] opties;
 
-    public void draaiMenu() {
+    public Menu(Printer printer) {
+        this.printer = printer;
+    }
+
+    public void draaiMenuAf() {
         String keuze;
 
         while (true) {
@@ -27,7 +35,7 @@ public abstract class Menu {
             }
 
             if (!keuze.isEmpty())
-                System.out.println("\nOngeldige keuze!");
+                printer.printErrorln("\nOngeldige keuze!");
         }
     }
 
@@ -45,7 +53,7 @@ public abstract class Menu {
                     .append("\n");
         }
 
-        System.out.println(sb);
+        printer.print(sb.toString());
     }
 
     private String vraagInvoer() {
@@ -56,14 +64,14 @@ public abstract class Menu {
     protected boolean afbreken() {
         Scanner in = new Scanner(System.in);
 
-        System.out.print("Weet u zeker dat u deze operatie af wilt breken? (J/N) ");
+        printer.print("Weet u zeker dat u deze operatie af wilt breken? (J/N) ");
         String invoer = in.nextLine();
 
         if (invoer.equals("J"))
             return true;
         if (invoer.equals("N"))
             return false;
-        System.out.println("Ongeldige invoer! ");
+        printer.printErrorln("Ongeldige invoer! ");
         return afbreken();
     }
 }
