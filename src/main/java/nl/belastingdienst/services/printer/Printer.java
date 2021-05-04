@@ -12,4 +12,6 @@ public interface Printer {
 
     void printMetNadruk(String string);
     void printlnMetNadruk(String string);
+
+    String scan();
 }

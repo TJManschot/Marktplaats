@@ -1,32 +1,23 @@
 package nl.belastingdienst.ui.algemeen;
 
+import java.util.function.BooleanSupplier;
+
 public class Optie {
-    private final String code;
     private String omschrijving;
-    private final Runnable runnable;
+    private final BooleanSupplier booleanSupplier;
 
-    public Optie(String code, String omschrijving, Runnable runnable) {
-        this.code = code;
+    public Optie(String omschrijving, BooleanSupplier booleanSupplier) {
         this.omschrijving = omschrijving;
-        this.runnable = runnable;
-    }
-
-    @Override
-    public String toString() {
-        return "(" + code + ") " + omschrijving;
+        this.booleanSupplier = booleanSupplier;
     }
 
     public void setOmschrijving(String omschrijving) {
         this.omschrijving = omschrijving;
     }
 
-    public String getCode() {
-        return this.code;
-    }
-
     public String getOmschrijving() { return omschrijving; }
 
-    public Runnable getRunnable() {
-        return this.runnable;
+    public BooleanSupplier getBooleanSupplier() {
+        return booleanSupplier;
     }
 }

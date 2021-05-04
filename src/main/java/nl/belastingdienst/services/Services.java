@@ -7,15 +7,8 @@ import javax.persistence.EntityManager;
 public enum Services {
     INSTANCE;
 
-    private Printer printer;
     private EntityManager entityManager;
-
-    public Services printer(Printer printer) {
-        if (this.printer != null)
-            throw new IllegalArgumentException("Cannot overwrite previous printer.");
-        this.printer = printer;
-        return this;
-    }
+    private Printer printer;
 
     public Services entityManager(EntityManager entityManager) {
         if (this.entityManager != null)
@@ -24,15 +17,22 @@ public enum Services {
         return this;
     }
 
-    public Printer getPrinter() {
-        if (printer == null)
-            throw new NullPointerException("Printerservie not set.");
-        return printer;
+    public Services printer(Printer printer) {
+        if (this.printer != null)
+            throw new IllegalArgumentException("Cannot overwrite previous printer.");
+        this.printer = printer;
+        return this;
     }
 
     public EntityManager getEntityManager() {
         if (entityManager == null)
             throw new NullPointerException("Entity manager not set.");
         return entityManager;
+    }
+
+    public Printer getPrinter() {
+        if (printer == null)
+            throw new NullPointerException("Printerservie not set.");
+        return printer;
     }
 }

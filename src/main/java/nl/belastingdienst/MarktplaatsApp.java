@@ -13,17 +13,16 @@ import java.util.List;
 public class MarktplaatsApp {
     public static void main(String[] args) {
         Services.INSTANCE
-                .printer(SystemPrinter.INSTANCE)
                 .entityManager(
                         Persistence
-                        .createEntityManagerFactory("MySQL-marktplaats")
-                        .createEntityManager()
-                );
+                                .createEntityManagerFactory("MySQL-marktplaats")
+                                .createEntityManager())
+                .printer(SystemPrinter.INSTANCE);
 
         MarktplaatsApp marktplaatsApp = new MarktplaatsApp();
         marktplaatsApp.firstStartup(); // Voert noodzakelijke rijen in de database in.
 
-        new Hoofdmenu(Services.INSTANCE.getPrinter()).draaiMenuAf();
+        new Hoofdmenu(Services.INSTANCE.getPrinter()).start();
     }
 
     public void firstStartup() {

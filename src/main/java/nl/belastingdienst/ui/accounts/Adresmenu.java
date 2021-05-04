@@ -11,52 +11,59 @@ public class Adresmenu extends Menu {
     public Adresmenu(Printer printer, Adres adres) {
         super(printer);
         this.adres = adres;
-        opties = new Optie[]{
-                new Optie("1", "Postcode", this::postcodeWijzigen),
-                new Optie("2", "Stad", this::stadWijzigen),
-                new Optie("3", "Straat", this::straatWijzigen),
-                new Optie("4", "Huisnummer", this::huisnummerWijzigen),
-                new Optie("T", "Terug", () -> { })
-        };
+
+        opties.put("1", new Optie("Postcode", this::postcodeWijzigen));
+        opties.put("2", new Optie("Stad", this::stadWijzigen));
+        opties.put("3", new Optie("Straat", this::straatWijzigen));
+        opties.put("4", new Optie("Huisnummer", this::huisnummerWijzigen));
+        opties.put("T", new Optie("Terug", () -> true));
     }
 
-    private void postcodeWijzigen() {
+    private boolean postcodeWijzigen() {
         System.out.println("Voer uw postcode in of kies A om af te breken.");
 
-        String invoer = in.nextLine();
+        String invoer = printer.scan();
         if (!invoer.equals("A")) {
             adres.setPostcode(invoer);
-            opties[0].setOmschrijving("Postcode:   " + invoer);
+            opties.get("1").setOmschrijving("Postcode:   " + invoer);
         }
+
+        return false;
     }
 
-    private void stadWijzigen() {
+    private boolean stadWijzigen() {
         System.out.println("Voer uw stad in of kies A om af te breken.");
 
-        String invoer = in.nextLine();
+        String invoer = printer.scan();
         if (!invoer.equals("A")) {
             adres.setStad(invoer);
-            opties[1].setOmschrijving("Stad:       " + invoer);
+            opties.get("2").setOmschrijving("Stad:       " + invoer);
         }
+
+        return false;
     }
 
-    private void straatWijzigen() {
+    private boolean straatWijzigen() {
         System.out.println("Voer uw straatnaam in of kies A om af te breken.");
 
-        String invoer = in.nextLine();
+        String invoer = printer.scan();
         if (!invoer.equals("A")) {
             adres.setStraat(invoer);
-            opties[2].setOmschrijving("Straat:     " + invoer);
+            opties.get("3").setOmschrijving("Straat:     " + invoer);
         }
+
+        return false;
     }
 
-    private void huisnummerWijzigen() {
+    private boolean huisnummerWijzigen() {
         System.out.println("Voer uw huisnummer in of kies A om af te breken.");
 
-        String invoer = in.nextLine();
+        String invoer = printer.scan();
         if (!invoer.equals("A")) {
             adres.setHuisnummer(invoer);
-            opties[3].setOmschrijving("Huisnummer: " + invoer);
+            opties.get("4").setOmschrijving("Huisnummer: " + invoer);
         }
+
+        return false;
     }
 }

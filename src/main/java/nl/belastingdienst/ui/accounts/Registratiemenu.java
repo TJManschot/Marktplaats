@@ -15,105 +15,99 @@ public class Registratiemenu extends Menu {
 
     public Registratiemenu(Printer printer) {
         super(printer);
-        opties = new Optie[]{
-                new Optie("1", "Gebruikersnaam kiezen", this::kiesGebruikersnaam),
-                new Optie("2", "Email-adres invoeren", this::voerEmailadresIn),
-                new Optie("3", "Adres invoeren", this::voerAdresIn),
-                new Optie("4", "Ondersteunde bezorgwijzen kiezen", bezorgwijzenkeuzemenu::draaiMenuAf),
-                new Optie("5", "[ ] Voorwaarden geaccepteerd", this::accepteerVoorwaarden),
-                new Optie("6", "Registratie afronden", this::rondAf),
-                new Optie("T", "Terug", () -> { })
-        };
+
+        opties.put("1", new Optie("Gebruikersnaam kiezen", this::kiesGebruikersnaam));
+        opties.put("2", new Optie("Email-adres invoeren", this::voerEmailadresIn));
+        opties.put("3", new Optie("Adres invoeren", this::voerAdresIn));
+        opties.put("4", new Optie("Ondersteunde bezorgwijzen kiezen", this::kiesBezorgwijzen));
+        opties.put("5", new KeuzeOptie("Voorwaarden geaccepteerd", this::accepteerVoorwaarden, false));
+        opties.put("6", new Optie("Registratie afronden", this::rondAf));
+        opties.put("T", new Optie("Terug", () -> true));
     }
 
-    public void kiesGebruikersnaam() {
+    public boolean kiesGebruikersnaam() {
         Gebruikersnaam gebruikersnaam = new Gebruikersnaam();
         String invoer;
 
         //noinspection ConditionalBreakInInfiniteLoop
         while (true) {
-            System.out.println("Kies een gebruikersnaam of kies A om af te breken");
+            printer.printlnMetNadruk("Kies een gebruikersnaam of kies A om af te breken");
 
-            invoer = in.nextLine();
+            invoer = printer.scan();
             if (invoer.equals("A"))
-                return;
+                return false;
 
             gebruikersnaam.setGebruikersnaam(invoer);
             if (gebruikerValidator.valideer(gebruikersnaam))
                 break;
         }
 
-        opties[0].setOmschrijving("Gebruikersnaam: " + gebruikersnaam.getGebruikersnaam());
+        opties.get("1").setOmschrijving("Gebruikersnaam: " + gebruikersnaam.getGebruikersnaam());
         gebruiker.setGebruikersnaam(gebruikersnaam);
+
+        return false;
     }
 
-    public void voerEmailadresIn() {
+    public boolean voerEmailadresIn() {
         Email email = new Email();
         String invoer;
 
         while (true) {
-            System.out.println("Voer uw emailadres in of kies A om af te breken");
+            printer.printlnMetNadruk("Voer uw emailadres in of kies A om af te breken");
 
-            invoer = in.nextLine();
+            invoer = printer.scan();
             if (invoer.equals("A")) {
                 if (afbreken())
-                    return;
+                    return false;
                 continue;
             }
 
             email.setEmail(invoer);
             if (gebruikerValidator.valideer(email))
                 break;
-
-            System.out.println("Ongeldig emailadres!");
         }
 
-        opties[1].setOmschrijving("Email: " + email.getEmail());
+        opties.get("2").setOmschrijving("Email: " + email.getEmail());
         gebruiker.setEmail(email);
+
+        return false;
     }
 
-    public void voerAdresIn() {
+    public boolean voerAdresIn() {
         Adres adres = new Adres();
         if (gebruiker.getAdres() != null)
             adres = gebruiker.getAdres();
 
-        new Adresmenu(printer, adres).draaiMenuAf();
+        new Adresmenu(printer, adres).start();
         if (gebruikerValidator.valideer(adres)) {
             gebruiker.setAdres(adres);
-            opties[2].setOmschrijving(
+            opties.get("3").setOmschrijving(
                     "Postcode: " + adres.getPostcode() + " " + adres.getStad() +
                             "\n    Straat:   " + adres.getStraat() + " " + adres.getHuisnummer()
             );
         }
+
+        return false;
     }
 
-    public void accepteerVoorwaarden() {
-        while (true) {
-            System.out.print("Accepteert u de voorwaarden? (J/N) ");
-            String invoer = in.nextLine();
-
-            if (invoer.equals("J")) {
-                isAkkoord = true;
-                opties[4].setOmschrijving("[X] Voorwaarden geaccepteerd");
-                break;
-            }
-
-            if (invoer.equals("N")) {
-                isAkkoord = false;
-                opties[4].setOmschrijving("[ ] Voorwaarden geaccepteerd");
-                break;
-            }
-
-            System.out.println("Ongeldige invoer!");
-        }
+    public boolean kiesBezorgwijzen() {
+        bezorgwijzenkeuzemenu.start();
+        return false;
     }
 
-    public void rondAf() {
+    public boolean accepteerVoorwaarden() {
+        ((KeuzeOptie) opties.get("5")).toggle();
+        isAkkoord = ((KeuzeOptie) opties.get("5")).isGekozen();
+
+        return false;
+    }
+
+    public boolean rondAf() {
         if (isAkkoord && gebruikerValidator.valideer(gebruiker)) {
-            System.out.println("Uw gegevens worden opgeslagen!");
+            printer.printInfoln("Uw gegevens worden opgeslagen!");
             GebruikerDao.getInstance(Services.INSTANCE.getEntityManager()).save(gebruiker);
-        } else {
-            System.out.println("Ongeldige invoer! Kan niet geregistreerd worden! ");
+            return true;
         }
+        return false;
     }
 }

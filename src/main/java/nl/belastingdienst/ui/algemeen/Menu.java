@@ -1,71 +1,59 @@
 package nl.belastingdienst.ui.algemeen;
 
 import nl.belastingdienst.services.printer.Printer;
-import nl.belastingdienst.services.Services;
 
-import java.util.Scanner;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public abstract class Menu {
-    protected Scanner in = new Scanner(System.in);
     protected Printer printer;
-    protected Optie[] opties;
+    protected Map<String, Optie> opties = new LinkedHashMap<>();
 
     public Menu(Printer printer) {
         this.printer = printer;
     }
 
-    public void draaiMenuAf() {
+    public void start() {
         String keuze;
+        Optie gekozen;
 
         while (true) {
-            toonOpties();
-            keuze = vraagInvoer();
+            toonMenu();
+            keuze = printer.scan();
 
-            if (keuze.equals(opties[opties.length - 1].getCode())) {
-                opties[opties.length-1].getRunnable().run();
+            gekozen = opties.get(keuze);
+
+            if (gekozen == null) {
+                printer.printErrorln("Ongeldige keuze!");
+                continue;
+            }
+
+            if (opties.get(keuze).getBooleanSupplier().getAsBoolean())
                 break;
-            }
-
-            for (Optie optie : opties) {
-                if (keuze.equals(optie.getCode())) {
-                    optie.getRunnable().run();
-                    keuze = "";
-                    break;
-                }
-            }
-
-            if (!keuze.isEmpty())
-                printer.printErrorln("\nOngeldige keuze!");
         }
     }
 
-    protected void toonOpties() {
-        StringBuilder sb = new StringBuilder();
+    protected void toonMenu() {
+        printer.print("--- ");
+        printer.printMetNadruk(getClass().getSimpleName());
+        printer.println(" ---");
 
-        sb.append(getClass().getSimpleName())
-                .append("\n");
-
-        for (Optie optie : opties) {
-            sb.append("(")
-                    .append(optie.getCode())
-                    .append(") ")
-                    .append(optie.getOmschrijving())
-                    .append("\n");
+        for (Map.Entry<String, Optie> entry : opties.entrySet()) {
+            if (entry.getValue() instanceof KeuzeOptie) {
+                if (((KeuzeOptie) entry.getValue()).isGekozen())
+                    printer.println("(" + entry.getKey() + ") [X] " + entry.getValue().getOmschrijving());
+                else
+                    printer.println("(" + entry.getKey() + ") [ ] " + entry.getValue().getOmschrijving());
+            } else
+                printer.println("(" + entry.getKey() + ") " + entry.getValue().getOmschrijving());
         }
 
-        printer.print(sb.toString());
-    }
-
-    private String vraagInvoer() {
-        System.out.print("Uw keuze: ");
-        return in.nextLine();
+        printer.print("\nUw keuze: ");
     }
 
     protected boolean afbreken() {
-        Scanner in = new Scanner(System.in);
-
         printer.print("Weet u zeker dat u deze operatie af wilt breken? (J/N) ");
-        String invoer = in.nextLine();
+        String invoer = printer.scan();
 
         if (invoer.equals("J"))
             return true;

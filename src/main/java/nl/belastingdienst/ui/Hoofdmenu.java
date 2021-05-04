@@ -10,12 +10,12 @@ public class Hoofdmenu extends Menu {
     
     public Hoofdmenu(Printer printer) {
         super(printer);
-        opties = new Optie[]{
-                new Optie("1", "Registreren", () -> {
-                    registratiemenu = new Registratiemenu(printer);
-                    registratiemenu.draaiMenuAf();
-                }),
-                new Optie("A", "Afsluiten", () -> { })
-        };
+
+        opties.put("1", new Optie("Registreren", () -> {
+            registratiemenu = new Registratiemenu(printer);
+            registratiemenu.start();
+            return false;
+        }));
+        opties.put("A", new Optie("Afsluiten", () -> true));
     }
 }
